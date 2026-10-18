@@ -63,10 +63,15 @@
 <li>Decided by the organizing committee (e.g. extra set, coin toss).</li></ol>
 <p>If a criterion ranks only some of the tied teams, the teams still tied move on to the next criterion; the sequence does <b>not</b> restart at (a). Playoff matches are best of 3 sets (25, 25, 15), and the same rules rank the playoff groups.</p></details>`;
 
+  function poolDone(p, res) {
+    const ms = data.matches.filter((m) => m.stage === "pool" && m.group === p);
+    return ms.length > 0 && ms.every((m) => (T.matchOutcome(results[m.id], m.stage) || {}).final);
+  }
+
   function renderStandings(res) {
     $("standings").innerHTML = TIEBREAK + '<p class="note">Top 2 in each pool advance to the Championship bracket; 3rd and 4th go to the Consolation bracket.</p>' +
       ["A", "B", "C"].map((p) => `<h2>Pool ${p} <small>Court ${p.charCodeAt(0) - 64}</small></h2>` +
-        table(res.poolTables[p], res, (i) => (i < 2 ? "adv" : "")) +
+        table(res.poolTables[p], res, (i) => (poolDone(p, res) && i < 2 ? "adv" : "")) +
         `<div class="grid">${data.matches.filter((m) => m.stage === "pool" && m.group === p).map((m) => matchCard(m, res)).join("")}</div>`).join("");
   }
 
