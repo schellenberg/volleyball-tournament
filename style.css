@@ -1,0 +1,31 @@
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f3f5f9;color:#1b2430}
+header{background:#12305c;color:#fff;padding:1rem 1rem 0;position:sticky;top:0;z-index:2}
+h1{margin:0;font-size:1.3rem}
+#subtitle,.status{margin:.2rem 0;font-size:.85rem;opacity:.85}
+nav{display:flex;gap:.25rem;margin-top:.5rem;overflow-x:auto}
+nav button{flex:1;padding:.7rem .5rem;border:0;background:transparent;color:#cfdcf2;font-size:1rem;border-bottom:3px solid transparent;cursor:pointer}
+nav button.active{color:#fff;border-color:#ffc83d;font-weight:600}
+main{max-width:1000px;margin:0 auto;padding:1rem}
+h2{margin:1.5rem 0 .5rem;font-size:1.2rem}h2 small{font-weight:400;color:#667}
+h3{margin:1rem 0 .4rem;font-size:1rem;color:#12305c}
+h3.break{color:#a60;text-align:center;border-top:1px dashed #ccc;padding-top:.6rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.6rem}
+.match,.team-card{background:#fff;border-radius:8px;padding:.6rem .75rem;box-shadow:0 1px 3px #0002}
+.meta{display:flex;justify-content:space-between;font-size:.75rem;color:#667;margin-bottom:.3rem}
+.tag{background:#e6ecf7;border-radius:4px;padding:0 .35rem}
+.team{display:flex;gap:.5rem;align-items:center;padding:.2rem 0}
+.team span{flex:1}.team b{min-width:1.2rem;text-align:right}.team i{font-size:.75rem;color:#667;font-style:normal;min-width:4.5rem;text-align:right}
+.team.win span,.team.win b{font-weight:700;color:#0a6b2d}
+.team.tbd span{color:#889;font-style:italic}
+.note{font-size:.85rem;color:#556}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;font-size:.9rem}
+th,td{padding:.45rem .5rem;text-align:center;border-bottom:1px solid #eef}
+th:nth-child(2),td:nth-child(2){text-align:left}
+tr.adv td{background:#eaf7ee}
+.seeds{margin:.2rem 0;padding-left:1.2rem;color:#556}
+.team-card h3{margin:.5rem 0 0}
+.photo{position:relative;aspect-ratio:4/3;background:#12305c;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:700}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.grid.teams{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}

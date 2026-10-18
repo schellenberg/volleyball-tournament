@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CVVC Aces 15U Volleyball Tournament</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1 id="title">CVVC Aces 15U Tournament</h1>
+  <p id="subtitle"></p>
+  <p class="status" id="status">Loading…</p>
+  <nav id="tabs">
+    <button data-tab="schedule" class="active">Schedule</button>
+    <button data-tab="standings">Pools</button>
+    <button data-tab="playoffs">Playoffs</button>
+    <button data-tab="teams">Teams</button>
+  </nav>
+</header>
+<main>
+  <section id="schedule"></section>
+  <section id="standings" hidden></section>
+  <section id="playoffs" hidden></section>
+  <section id="teams" hidden></section>
+</main>
+<script src="config.js"></script>
+<script src="tournament.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
