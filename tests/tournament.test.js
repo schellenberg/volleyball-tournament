@@ -46,23 +46,20 @@ assert.strictEqual(T.matchOutcome([[25, 20]], "pool").final, false);
 assert.strictEqual(T.matchOutcome([[25, 20], [20, 25]], "playoff").final, false, "playoffs go to a 3rd set");
 assert.strictEqual(T.matchOutcome([[25, 20], [20, 25], [15, 5]], "playoff").final, true);
 
-// Tiebreakers: wins, sets won, head-to-head, total points
+// Tiebreakers (Volleyball Canada rulebook)
 const mk = (id, a, b) => ({ id, a, b, stage: "pool" });
 const rank = (ms, csv, ids) =>
   T.standings(ids, ms, T.parseResults("match,s1a,s1b,s2a,s2b\n" + csv)).map((x) => x.id);
-// x,y tied on wins (1) and sets (3); y beat x head-to-head
-assert.deepStrictEqual(
-  rank([mk("1", "x", "y"), mk("2", "x", "z"), mk("3", "y", "z")],
-    "1,20,25,20,25\n2,25,20,20,25\n3,25,20,25,20", ["x", "y", "z"]),
-  ["y", "x", "z"]);
-// Equal wins, sets won decides before head-to-head: x split with w, y beat w; x beat y? (x 2-0 y)
-assert.deepStrictEqual(
-  rank([mk("1", "x", "y"), mk("2", "x", "w"), mk("3", "y", "w")],
-    "1,25,20,25,20\n2,25,20,20,25\n3,25,20,25,20", ["x", "y", "w"]),
-  ["x", "y", "w"]);
-// Total points as final tiebreak: equal wins, sets, no head-to-head winner
-assert.deepStrictEqual(
-  rank([mk("1", "x", "y")], "1,25,20,20,25", ["x", "y"]), ["x", "y"]);
-assert.deepStrictEqual(
-  rank([mk("1", "x", "y")], "1,25,20,20,26", ["x", "y"]), ["y", "x"]);
+const W = "25,20,25,20", L = "20,25,20,25", S = "25,20,20,25"; // win, loss, split (for first-listed team)
+// Two teams tied on wins: head-to-head winner ranks higher (x 2 wins, y 2 wins, z 1, w 1)
+const four = [mk("1", "x", "y"), mk("2", "x", "z"), mk("3", "x", "w"), mk("4", "y", "z"), mk("5", "y", "w"), mk("6", "z", "w")];
+assert.deepStrictEqual(rank(four, `1,${W}\n2,${W}\n3,${L}\n4,${W}\n5,${W}\n6,${W}`, ["x", "y", "z", "w"]), ["x", "y", "z", "w"]);
+// Three-way tie x>y>z>x: (a)-(c) equal; (d) points ratio among the tied teams decides: x, z, y
+const ms3 = [mk("1", "x", "y"), mk("2", "y", "z"), mk("3", "z", "x")];
+assert.deepStrictEqual(rank(ms3, "1,25,10,25,10\n2,25,20,25,20\n3,25,20,25,20", ["x", "y", "z"]), ["x", "z", "y"]);
+// Partial separation does not restart at (a): set ratio (b) ranks z first (3-1 sets), then x,y continue to (c)+
+assert.strictEqual(rank(ms3, "1,25,20,25,20\n2,25,20,20,25\n3,25,20,25,20", ["x", "y", "z"])[0], "z");
+// A 1-1 split gives no match win to either team
+const st = T.standings(["x", "y"], [mk("1", "x", "y")], T.parseResults("match,s1a,s1b,s2a,s2b\n1," + S));
+assert.deepStrictEqual(st.map((r) => r.wins), [0, 0]);
 console.log("ok tiebreak");

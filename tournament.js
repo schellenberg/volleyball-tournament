@@ -69,31 +69,51 @@
       B.pointsFor += o.pointsB; B.pointsAgainst += o.pointsA;
       if (o.setsA > o.setsB) { A.wins++; B.losses++; } else if (o.setsB > o.setsA) { B.wins++; A.losses++; }
     });
-    // Match wins counting only games among the given teams (head-to-head)
-    const h2hWins = (ids) => {
-      const w = {};
-      ids.forEach((id) => (w[id] = 0));
-      final.forEach((m) => {
-        if (!(m.a in w) || !(m.b in w)) return;
-        const o = out(m);
-        if (o.setsA > o.setsB) w[m.a]++; else if (o.setsB > o.setsA) w[m.b]++;
-      });
-      return w;
-    };
     const byName = (x, y) => ((names && names[x]) || x).localeCompare((names && names[y]) || y);
-    // Ties on match wins: 1) sets won, 2) head-to-head among tied teams, 3) total points, 4) coin toss.
-    // When a step separates only some teams, the rest are re-ranked from step 1 among themselves.
+    const ratio = (n, d) => (d === 0 ? (n === 0 ? 0 : Infinity) : n / d);
+    // Totals counting only games among the given teams
+    const within = (ids) => {
+      const s = {};
+      ids.forEach((id) => (s[id] = { mw: 0, ml: 0, sw: 0, sl: 0, pf: 0, pa: 0 }));
+      final.forEach((m) => {
+        if (!s[m.a] || !s[m.b]) return;
+        const o = out(m), A = s[m.a], B = s[m.b];
+        A.sw += o.setsA; A.sl += o.setsB; B.sw += o.setsB; B.sl += o.setsA;
+        A.pf += o.pointsA; A.pa += o.pointsB; B.pf += o.pointsB; B.pa += o.pointsA;
+        if (o.setsA > o.setsB) { A.mw++; B.ml++; } else if (o.setsB > o.setsA) { B.mw++; A.ml++; }
+      });
+      return s;
+    };
+    const overall = within(teamIds);
+    // Volleyball Canada tie-breaking criteria a-e, in order (f = organizing committee)
+    const criteria = [
+      (id, g) => ratio(g[id].mw, g[id].ml),
+      (id, g) => ratio(g[id].sw, g[id].sl),
+      (id) => ratio(overall[id].sw, overall[id].sl),
+      (id, g) => ratio(g[id].pf, g[id].pa),
+      (id) => ratio(overall[id].pf, overall[id].pa)
+    ];
+    // Ranks `ids` (still tied) starting at criterion `from`. `group` is the full original tied set,
+    // whose mutual results are used for the "between the tied teams" criteria. Never restarts at "a".
+    function rank(ids, group, from) {
+      if (ids.length < 2) return ids;
+      for (let i = from; i < criteria.length; i++) {
+        const groups = {};
+        ids.forEach((id) => { const k = criteria[i](id, group.stats); (groups[k] = groups[k] || []).push(id); });
+        const keys = Object.keys(groups).sort((x, y) => y - x);
+        if (keys.length > 1) return keys.flatMap((k) => rank(groups[k], group, i + 1));
+      }
+      return ids.slice().sort(byName); // criterion f: organizing committee (coin toss); alphabetical placeholder
+    }
     function breakTie(ids) {
       if (ids.length < 2) return ids;
-      const h = h2hWins(ids);
-      const steps = [(id) => t[id].setsWon, (id) => h[id], (id) => t[id].pointsFor];
-      for (const f of steps) {
-        const groups = {};
-        ids.forEach((id) => (groups[f(id)] = groups[f(id)] || []).push(id));
-        const keys = Object.keys(groups).sort((x, y) => y - x);
-        if (keys.length > 1) return keys.flatMap((k) => breakTie(groups[k]));
+      const group = { stats: within(ids) };
+      if (ids.length === 2) {
+        // Two teams: the head-to-head winner is ranked higher (a split falls through to the criteria)
+        const [x, y] = ids, g = group.stats;
+        if (g[x].mw !== g[y].mw) return g[x].mw > g[y].mw ? [x, y] : [y, x];
       }
-      return ids.slice().sort(byName); // coin toss needed; alphabetical placeholder
+      return rank(ids, group, 0);
     }
     const byWins = {};
     Object.values(t).forEach((r) => (byWins[r.wins] = byWins[r.wins] || []).push(r.id));
