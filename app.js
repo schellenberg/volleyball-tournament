@@ -46,9 +46,9 @@
     $("schedule").innerHTML = html;
   }
 
-  function table(rows, res, extra) {
-    return `<div class="scroll"><table><thead><tr><th>#</th><th>Team</th><th>W</th><th>L</th><th>Sets</th><th>Pts +/-</th></tr></thead><tbody>${rows
-      .map((r, i) => `<tr class="${extra && extra(i) || ""}"><td>${i + 1}</td><td>${esc(res.names[r.id])}</td><td>${r.wins}</td><td>${r.losses}</td><td>${r.setsWon}-${r.setsLost}</td><td>${r.pointsFor - r.pointsAgainst > 0 ? "+" : ""}${r.pointsFor - r.pointsAgainst}</td></tr>`)
+  function table(rows, res, extra, position) {
+    return `<div class="scroll"><table><thead><tr><th>${position ? position.label : "#"}</th><th>Team</th><th>W</th><th>L</th><th>Sets</th><th>Pts +/-</th></tr></thead><tbody>${rows
+      .map((r, i) => `<tr class="${extra && extra(r, i) || ""}"><td>${position ? position.value(r, i) : i + 1}</td><td>${esc(res.names[r.id])}</td><td>${r.wins}</td><td>${r.losses}</td><td>${r.setsWon}-${r.setsLost}</td><td>${r.pointsFor - r.pointsAgainst > 0 ? "+" : ""}${r.pointsFor - r.pointsAgainst}</td></tr>`)
       .join("")}</tbody></table></div>`;
   }
 
@@ -70,9 +70,17 @@
 
   function renderStandings(res) {
     $("standings").innerHTML = TIEBREAK + '<p class="note">Top 2 in each pool advance to the Championship bracket; 3rd and 4th go to the Consolation bracket.</p>' +
-      ["A", "B", "C"].map((p) => `<h2>Pool ${p} <small>Court ${p.charCodeAt(0) - 64}</small></h2>` +
-        table(res.poolTables[p], res, (i) => (poolDone(p, res) && i < 2 ? "adv" : "")) +
-        `<div class="grid">${data.matches.filter((m) => m.stage === "pool" && m.group === p).map((m) => matchCard(m, res)).join("")}</div>`).join("");
+      ["A", "B", "C"].map((p) => {
+        const seedByTeam = new Map(data.teams.filter((t) => t.pool === p).map((t) => [t.id, t.seed]));
+        const advancing = poolDone(p, res) ? new Set(res.poolTables[p].slice(0, 2).map((r) => r.id)) : new Set();
+        const rows = res.poolTables[p].slice().sort((a, b) => seedByTeam.get(a.id) - seedByTeam.get(b.id));
+        return `<h2>Pool ${p} <small>Court ${p.charCodeAt(0) - 64}</small></h2>` +
+          table(rows, res, (r) => (advancing.has(r.id) ? "adv" : ""), {
+            label: "Seed",
+            value: (r) => seedByTeam.get(r.id)
+          }) +
+          `<div class="grid">${data.matches.filter((m) => m.stage === "pool" && m.group === p).map((m) => matchCard(m, res)).join("")}</div>`;
+      }).join("");
   }
 
   function renderPlayoffs(res) {
