@@ -15,7 +15,7 @@ Results are a CSV with columns `match,s1a,s1b,s2a,s2b,s3a,s3b` (match ids like `
 - Google Sheet: create a sheet with those columns, *File → Share → Publish to web → CSV*, and paste the URL into `RESULTS_CSV_URL` in `config.js`. The page refreshes every 60 seconds; standings and playoff matchups fill in automatically.
 
 ## Rosters & photos
-Add players to each team's `roster` (`{"number":7,"name":"…","position":"OH"}`) in `data/tournament.json`, and put the team photo at `images/teams/<team-id>.jpg`.
+Add `teams/<team>.md` (coach + player lines) and `teams/<team>.jpg`, then run `python3 scripts/build_teams.py` (a GitHub Action does this on push). See `teams/README.md`.
 
 ## Tests
 `node tests/tournament.test.js`
