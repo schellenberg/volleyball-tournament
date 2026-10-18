@@ -3,9 +3,9 @@
 Mobile-friendly static site (host on GitHub Pages or open via any static server, e.g. `python3 -m http.server`).
 
 ## Format
-- 3 pools of 4 teams; each pool is a full round robin on its own court (A→Court 1, B→2, C→3). Best of 3 sets (25, 25, 15).
+- 3 pools of 4 teams; each pool is a full round robin on its own court (A→Court 1, B→2, C→3). Pool matches are 2 sets (no third set); playoff matches are best of 3 (25, 25, 15).
 - Top 2 per pool → Championship bracket; 3rd/4th → Consolation bracket. Each bracket's 6 teams split into two 3-team round-robin groups (A1/B2/C2 vs B1/C1/A2 style cross-pool groups), followed by placement matches (1st v 1st = final, 2nd v 2nd, 3rd v 3rd). Every team plays 6 matches.
-- Schedule: pool play 8:30–12:00, lunch, playoff round robins 12:30–2:50, placement matches 2:50–4:00 (35-minute slots; edit `data/tournament.json` to change).
+- Schedule: 60-minute slots, no lunch break. Pool play 8:00 AM–2:00 PM, playoff round robins 2:00–6:00 PM, placement matches 6:00–8:00 PM (edit `data/tournament.json` to change).
 
 ## Entering results
 Tie-breaking (shown on the Pools tab) is documented in `app.js` (`TIEBREAK`) and implemented in `tournament.js`.

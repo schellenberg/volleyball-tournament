@@ -39,12 +39,30 @@ assert.deepStrictEqual(T.parseResults("match,s1a,s1b\nA1,25,20,,\n").A1, [[25, 2
 assert.strictEqual(T.matchOutcome([[25, 20]]).final, false);
 console.log("ok");
 
-// Tiebreakers: 3-way tie on wins, resolved by set ratio among tied teams
-const mk = (id, a, b) => ({ id, a, b });
-const ms = [mk("1", "x", "y"), mk("2", "y", "z"), mk("3", "z", "x"), mk("4", "x", "w"), mk("5", "y", "w"), mk("6", "z", "w")];
-const r = T.parseResults(["match,s1a,s1b,s2a,s2b,s3a,s3b",
-  "1,25,20,25,20,,", "2,25,20,25,20,,", "3,25,23,20,25,15,10", // x>y, y>z, z>x (3-1 sets)
-  "4,25,0,25,0,,", "5,25,0,25,0,,", "6,25,0,25,0,,"].join("\n"));
-const st = T.standings(["x", "y", "z", "w"], ms, r);
-assert.deepStrictEqual(st.map((s) => s.id), ["x", "y", "z", "w"]); // sets among tied: x 3-2, y 2-2, z 2-3
+// Pool play: 2 sets, no third set; 1-1 split is no win for either team
+const split = T.matchOutcome([[25, 20], [20, 25], [15, 5]], "pool");
+assert.deepStrictEqual([split.setsA, split.setsB, split.final], [1, 1, true]);
+assert.strictEqual(T.matchOutcome([[25, 20]], "pool").final, false);
+assert.strictEqual(T.matchOutcome([[25, 20], [20, 25]], "playoff").final, false, "playoffs go to a 3rd set");
+assert.strictEqual(T.matchOutcome([[25, 20], [20, 25], [15, 5]], "playoff").final, true);
+
+// Tiebreakers: wins, sets won, head-to-head, total points
+const mk = (id, a, b) => ({ id, a, b, stage: "pool" });
+const rank = (ms, csv, ids) =>
+  T.standings(ids, ms, T.parseResults("match,s1a,s1b,s2a,s2b\n" + csv)).map((x) => x.id);
+// x,y tied on wins (1) and sets (3); y beat x head-to-head
+assert.deepStrictEqual(
+  rank([mk("1", "x", "y"), mk("2", "x", "z"), mk("3", "y", "z")],
+    "1,20,25,20,25\n2,25,20,20,25\n3,25,20,25,20", ["x", "y", "z"]),
+  ["y", "x", "z"]);
+// Equal wins, sets won decides before head-to-head: x split with w, y beat w; x beat y? (x 2-0 y)
+assert.deepStrictEqual(
+  rank([mk("1", "x", "y"), mk("2", "x", "w"), mk("3", "y", "w")],
+    "1,25,20,25,20\n2,25,20,20,25\n3,25,20,25,20", ["x", "y", "w"]),
+  ["x", "y", "w"]);
+// Total points as final tiebreak: equal wins, sets, no head-to-head winner
+assert.deepStrictEqual(
+  rank([mk("1", "x", "y")], "1,25,20,20,25", ["x", "y"]), ["x", "y"]);
+assert.deepStrictEqual(
+  rank([mk("1", "x", "y")], "1,25,20,20,26", ["x", "y"]), ["y", "x"]);
 console.log("ok tiebreak");

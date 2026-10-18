@@ -23,11 +23,11 @@
   function matchCard(m, res) {
     const a = res.names[m.a] ? { text: res.names[m.a], real: true } : label(m.a, res);
     const b = res.names[m.b] ? { text: res.names[m.b], real: true } : label(m.b, res);
-    const sets = results[m.id], o = T.matchOutcome(sets);
+    const sets = results[m.id], o = T.matchOutcome(sets, m.stage);
     const done = o && o.final;
     const win = (side) => done && (side === "a" ? o.setsA > o.setsB : o.setsB > o.setsA);
     const tag = m.stage === "pool" ? "Pool " + m.group : m.stage === "final" ? m.label : groupName(m.group);
-    const score = (i) => (sets ? sets.map((s) => s[i]).join(" · ") : "");
+    const score = (i) => (sets ? (m.stage === "pool" ? sets.slice(0, 2) : sets).map((s) => s[i]).join(" · ") : "");
     return `<div class="match ${done ? "done" : ""}">
       <div class="meta"><span>${fmtTime(m.time)} · Court ${m.court}</span><span class="tag">${esc(tag)}</span></div>
       <div class="team ${win("a") ? "win" : ""} ${a.real ? "" : "tbd"}"><span>${esc(a.text)}</span><b>${o ? o.setsA : ""}</b><i>${score(0)}</i></div>
@@ -41,7 +41,6 @@
     let html = "";
     times.forEach((t) => {
       const ms = data.matches.filter((m) => m.time === t).sort((x, y) => x.court - y.court);
-      if (t === "12:30") html += `<h3 class="break">Lunch break</h3>`;
       html += `<h3>${fmtTime(t)}</h3><div class="grid">${ms.map((m) => matchCard(m, res)).join("")}</div>`;
     });
     $("schedule").innerHTML = html;
@@ -53,14 +52,13 @@
       .join("")}</tbody></table></div>`;
   }
 
-  const TIEBREAK = `<details class="rules" open><summary>How teams are ranked</summary><p>Teams are ranked by <b>matches won</b>. A match is won by taking 2 sets. If teams are tied, these steps are applied in order until the tie is broken:</p><ol>
-<li><b>Head-to-head:</b> matches won in games among only the tied teams.</li>
-<li><b>Set ratio</b> (sets won ÷ sets lost) in games among only the tied teams.</li>
-<li><b>Set ratio</b> in all pool matches.</li>
-<li><b>Point ratio</b> (points scored ÷ points allowed) in games among only the tied teams.</li>
-<li><b>Point ratio</b> in all pool matches.</li>
-<li><b>Coin toss</b> or tournament organizer decision.</li></ol>
-<p>When three or more teams are tied and a step separates only some of them, the teams still tied start again from step 1. The same rules rank the playoff groups.</p></details>`;
+  const TIEBREAK = `<details class="rules" open><summary>How teams are ranked</summary><p>Teams are ranked by <b>match wins</b>. Pool play is 2 sets per match (no third set); a match is won only by winning <b>both</b> sets, and a 1–1 split gives no win to either team. Ties are broken in this order:</p><ol>
+<li><b>Match wins</b> (not total points).</li>
+<li><b>Sets won</b>.</li>
+<li><b>Head-to-head</b> results among the tied teams.</li>
+<li><b>Total points</b> scored.</li>
+<li><b>Toss of coin</b>.</li></ol>
+<p>If a step separates only some of three or more tied teams, the teams still tied are ranked again among themselves. Playoff matches are best of 3 sets (25, 25, 15), and the same ranking rules apply to the playoff groups.</p></details>`;
 
   function renderStandings(res) {
     $("standings").innerHTML = TIEBREAK + '<p class="note">Top 2 in each pool advance to the Championship bracket; 3rd and 4th go to the Consolation bracket.</p>' +

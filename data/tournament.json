@@ -2,7 +2,7 @@
  "name": "CVVC Aces 15U Volleyball Tournament",
  "date": "2026-12-13",
  "dateLabel": "Sunday, December 13, 2026",
- "format": "Best of 3 sets (25, 25, 15). Win by 2.",
+ "format": "Pool play: 2 sets per match (no 3rd set). Playoffs: best of 3 sets (25, 25, 15).",
  "teams": [
   {
    "id": "aces",
@@ -140,7 +140,7 @@
    "id": "A1",
    "stage": "pool",
    "group": "A",
-   "time": "08:30",
+   "time": "08:00",
    "court": 1,
    "a": "aces",
    "b": "qcvc-elite"
@@ -149,7 +149,7 @@
    "id": "B1",
    "stage": "pool",
    "group": "B",
-   "time": "08:30",
+   "time": "08:00",
    "court": 2,
    "a": "langenburg-lightning",
    "b": "huskie-elite"
@@ -158,7 +158,7 @@
    "id": "C1",
    "stage": "pool",
    "group": "C",
-   "time": "08:30",
+   "time": "08:00",
    "court": 3,
    "a": "summit",
    "b": "momentum-black"
@@ -167,7 +167,7 @@
    "id": "A2",
    "stage": "pool",
    "group": "A",
-   "time": "09:05",
+   "time": "09:00",
    "court": 1,
    "a": "jcvc-red",
    "b": "humboldt-chaos"
@@ -176,7 +176,7 @@
    "id": "B2",
    "stage": "pool",
    "group": "B",
-   "time": "09:05",
+   "time": "09:00",
    "court": 2,
    "a": "tvc-inferno",
    "b": "cobras"
@@ -185,7 +185,7 @@
    "id": "C2",
    "stage": "pool",
    "group": "C",
-   "time": "09:05",
+   "time": "09:00",
    "court": 3,
    "a": "cvvc-force",
    "b": "qcvc-selects"
@@ -194,7 +194,7 @@
    "id": "A3",
    "stage": "pool",
    "group": "A",
-   "time": "09:40",
+   "time": "10:00",
    "court": 1,
    "a": "aces",
    "b": "jcvc-red"
@@ -203,7 +203,7 @@
    "id": "B3",
    "stage": "pool",
    "group": "B",
-   "time": "09:40",
+   "time": "10:00",
    "court": 2,
    "a": "langenburg-lightning",
    "b": "tvc-inferno"
@@ -212,7 +212,7 @@
    "id": "C3",
    "stage": "pool",
    "group": "C",
-   "time": "09:40",
+   "time": "10:00",
    "court": 3,
    "a": "summit",
    "b": "cvvc-force"
@@ -221,7 +221,7 @@
    "id": "A4",
    "stage": "pool",
    "group": "A",
-   "time": "10:15",
+   "time": "11:00",
    "court": 1,
    "a": "qcvc-elite",
    "b": "humboldt-chaos"
@@ -230,7 +230,7 @@
    "id": "B4",
    "stage": "pool",
    "group": "B",
-   "time": "10:15",
+   "time": "11:00",
    "court": 2,
    "a": "huskie-elite",
    "b": "cobras"
@@ -239,7 +239,7 @@
    "id": "C4",
    "stage": "pool",
    "group": "C",
-   "time": "10:15",
+   "time": "11:00",
    "court": 3,
    "a": "momentum-black",
    "b": "qcvc-selects"
@@ -248,7 +248,7 @@
    "id": "A5",
    "stage": "pool",
    "group": "A",
-   "time": "10:50",
+   "time": "12:00",
    "court": 1,
    "a": "aces",
    "b": "humboldt-chaos"
@@ -257,7 +257,7 @@
    "id": "B5",
    "stage": "pool",
    "group": "B",
-   "time": "10:50",
+   "time": "12:00",
    "court": 2,
    "a": "langenburg-lightning",
    "b": "cobras"
@@ -266,7 +266,7 @@
    "id": "C5",
    "stage": "pool",
    "group": "C",
-   "time": "10:50",
+   "time": "12:00",
    "court": 3,
    "a": "summit",
    "b": "qcvc-selects"
@@ -275,7 +275,7 @@
    "id": "A6",
    "stage": "pool",
    "group": "A",
-   "time": "11:25",
+   "time": "13:00",
    "court": 1,
    "a": "qcvc-elite",
    "b": "jcvc-red"
@@ -284,7 +284,7 @@
    "id": "B6",
    "stage": "pool",
    "group": "B",
-   "time": "11:25",
+   "time": "13:00",
    "court": 2,
    "a": "huskie-elite",
    "b": "tvc-inferno"
@@ -293,7 +293,7 @@
    "id": "C6",
    "stage": "pool",
    "group": "C",
-   "time": "11:25",
+   "time": "13:00",
    "court": 3,
    "a": "momentum-black",
    "b": "cvvc-force"
@@ -302,7 +302,7 @@
    "id": "CX1",
    "stage": "playoff",
    "group": "CX",
-   "time": "12:30",
+   "time": "14:00",
    "court": 1,
    "a": "A1",
    "b": "B2"
@@ -311,7 +311,7 @@
    "id": "CY1",
    "stage": "playoff",
    "group": "CY",
-   "time": "12:30",
+   "time": "14:00",
    "court": 2,
    "a": "B1",
    "b": "C1"
@@ -320,7 +320,7 @@
    "id": "KX1",
    "stage": "playoff",
    "group": "KX",
-   "time": "12:30",
+   "time": "14:00",
    "court": 3,
    "a": "A3",
    "b": "B4"
@@ -329,7 +329,7 @@
    "id": "KY1",
    "stage": "playoff",
    "group": "KY",
-   "time": "13:05",
+   "time": "15:00",
    "court": 1,
    "a": "B3",
    "b": "C3"
@@ -338,7 +338,7 @@
    "id": "CX2",
    "stage": "playoff",
    "group": "CX",
-   "time": "13:05",
+   "time": "15:00",
    "court": 2,
    "a": "C2",
    "b": "A1"
@@ -347,7 +347,7 @@
    "id": "CY2",
    "stage": "playoff",
    "group": "CY",
-   "time": "13:05",
+   "time": "15:00",
    "court": 3,
    "a": "A2",
    "b": "B1"
@@ -356,7 +356,7 @@
    "id": "KX2",
    "stage": "playoff",
    "group": "KX",
-   "time": "13:40",
+   "time": "16:00",
    "court": 1,
    "a": "C4",
    "b": "A3"
@@ -365,7 +365,7 @@
    "id": "KY2",
    "stage": "playoff",
    "group": "KY",
-   "time": "13:40",
+   "time": "16:00",
    "court": 2,
    "a": "A4",
    "b": "B3"
@@ -374,7 +374,7 @@
    "id": "CX3",
    "stage": "playoff",
    "group": "CX",
-   "time": "13:40",
+   "time": "16:00",
    "court": 3,
    "a": "B2",
    "b": "C2"
@@ -383,7 +383,7 @@
    "id": "CY3",
    "stage": "playoff",
    "group": "CY",
-   "time": "14:15",
+   "time": "17:00",
    "court": 1,
    "a": "C1",
    "b": "A2"
@@ -392,7 +392,7 @@
    "id": "KX3",
    "stage": "playoff",
    "group": "KX",
-   "time": "14:15",
+   "time": "17:00",
    "court": 2,
    "a": "B4",
    "b": "C4"
@@ -401,7 +401,7 @@
    "id": "KY3",
    "stage": "playoff",
    "group": "KY",
-   "time": "14:15",
+   "time": "17:00",
    "court": 3,
    "a": "C3",
    "b": "A4"
@@ -411,7 +411,7 @@
    "stage": "final",
    "group": "K",
    "label": "Consolation Final",
-   "time": "14:50",
+   "time": "18:00",
    "court": 1,
    "a": "KX1",
    "b": "KY1"
@@ -421,7 +421,7 @@
    "stage": "final",
    "group": "K",
    "label": "Consolation 3rd Place",
-   "time": "14:50",
+   "time": "18:00",
    "court": 2,
    "a": "KX2",
    "b": "KY2"
@@ -431,7 +431,7 @@
    "stage": "final",
    "group": "K",
    "label": "Consolation 5th Place",
-   "time": "14:50",
+   "time": "18:00",
    "court": 3,
    "a": "KX3",
    "b": "KY3"
@@ -441,7 +441,7 @@
    "stage": "final",
    "group": "C",
    "label": "Championship Final",
-   "time": "15:25",
+   "time": "19:00",
    "court": 1,
    "a": "CX1",
    "b": "CY1"
@@ -451,7 +451,7 @@
    "stage": "final",
    "group": "C",
    "label": "Championship 3rd Place",
-   "time": "15:25",
+   "time": "19:00",
    "court": 2,
    "a": "CX2",
    "b": "CY2"
@@ -461,7 +461,7 @@
    "stage": "final",
    "group": "C",
    "label": "Championship 5th Place",
-   "time": "15:25",
+   "time": "19:00",
    "court": 3,
    "a": "CX3",
    "b": "CY3"

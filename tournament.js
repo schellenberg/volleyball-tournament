@@ -42,12 +42,15 @@
     return out;
   }
 
-  // A match is final once one side has won 2 sets.
-  function matchOutcome(sets) {
+  // Pool matches are exactly 2 sets (a 1-1 split is final: no match winner).
+  // Playoff matches are best of 3: final once one side has won 2 sets.
+  function matchOutcome(sets, stage) {
     if (!sets) return null;
+    const pool = stage === "pool";
+    const played = pool ? sets.slice(0, 2) : sets;
     let wa = 0, wb = 0, pa = 0, pb = 0;
-    sets.forEach(([a, b]) => { if (a > b) wa++; else if (b > a) wb++; pa += a; pb += b; });
-    return { setsA: wa, setsB: wb, pointsA: pa, pointsB: pb, final: wa >= 2 || wb >= 2 };
+    played.forEach(([a, b]) => { if (a > b) wa++; else if (b > a) wb++; pa += a; pb += b; });
+    return { setsA: wa, setsB: wb, pointsA: pa, pointsB: pb, final: pool ? played.length >= 2 : wa >= 2 || wb >= 2 };
   }
 
   // rows: [{id, played, wins, losses, setsWon, setsLost, pointsFor, pointsAgainst}], sorted
@@ -56,63 +59,51 @@
     teamIds.forEach((id) => {
       t[id] = { id, played: 0, wins: 0, losses: 0, setsWon: 0, setsLost: 0, pointsFor: 0, pointsAgainst: 0 };
     });
-    matches.forEach((m) => {
-      const o = matchOutcome(results[m.id]);
-      if (!o || !o.final || !t[m.a] || !t[m.b]) return;
-      const A = t[m.a], B = t[m.b];
+    const out = (m) => matchOutcome(results[m.id], m.stage);
+    const final = matches.filter((m) => t[m.a] && t[m.b] && (out(m) || {}).final);
+    final.forEach((m) => {
+      const o = out(m), A = t[m.a], B = t[m.b];
       A.played++; B.played++;
       A.setsWon += o.setsA; A.setsLost += o.setsB; B.setsWon += o.setsB; B.setsLost += o.setsA;
       A.pointsFor += o.pointsA; A.pointsAgainst += o.pointsB;
       B.pointsFor += o.pointsB; B.pointsAgainst += o.pointsA;
-      if (o.setsA > o.setsB) { A.wins++; B.losses++; } else { B.wins++; A.losses++; }
+      if (o.setsA > o.setsB) { A.wins++; B.losses++; } else if (o.setsB > o.setsA) { B.wins++; A.losses++; }
     });
-    const ratio = (n, d) => (d === 0 ? (n === 0 ? 0 : Infinity) : n / d);
-    const final = matches.filter((m) => t[m.a] && t[m.b] && (matchOutcome(results[m.id]) || {}).final);
-    // Wins / set and point totals counting only the given team ids' matches against each other
-    const within = (ids) => {
-      const s = {};
-      ids.forEach((id) => (s[id] = { w: 0, sw: 0, sl: 0, pf: 0, pa: 0 }));
+    // Match wins counting only games among the given teams (head-to-head)
+    const h2hWins = (ids) => {
+      const w = {};
+      ids.forEach((id) => (w[id] = 0));
       final.forEach((m) => {
-        if (!s[m.a] || !s[m.b]) return;
-        const o = matchOutcome(results[m.id]);
-        s[m.a].sw += o.setsA; s[m.a].sl += o.setsB; s[m.a].pf += o.pointsA; s[m.a].pa += o.pointsB;
-        s[m.b].sw += o.setsB; s[m.b].sl += o.setsA; s[m.b].pf += o.pointsB; s[m.b].pa += o.pointsA;
-        s[o.setsA > o.setsB ? m.a : m.b].w++;
+        if (!(m.a in w) || !(m.b in w)) return;
+        const o = out(m);
+        if (o.setsA > o.setsB) w[m.a]++; else if (o.setsB > o.setsA) w[m.b]++;
       });
-      return s;
+      return w;
     };
-    const all = within(teamIds);
-    const criteria = [
-      (id, tied) => tied[id].w,
-      (id, tied) => ratio(tied[id].sw, tied[id].sl),
-      (id) => ratio(all[id].sw, all[id].sl),
-      (id, tied) => ratio(tied[id].pf, tied[id].pa),
-      (id) => ratio(all[id].pf, all[id].pa)
-    ];
     const byName = (x, y) => ((names && names[x]) || x).localeCompare((names && names[y]) || y);
-    // Splits a tied group using each criterion in order; any still-tied subgroup restarts at criterion 1
+    // Ties on match wins: 1) sets won, 2) head-to-head among tied teams, 3) total points, 4) coin toss.
+    // When a step separates only some teams, the rest are re-ranked from step 1 among themselves.
     function breakTie(ids) {
       if (ids.length < 2) return ids;
-      const tied = within(ids);
-      for (const f of criteria) {
+      const h = h2hWins(ids);
+      const steps = [(id) => t[id].setsWon, (id) => h[id], (id) => t[id].pointsFor];
+      for (const f of steps) {
         const groups = {};
-        ids.forEach((id) => (groups[f(id, tied)] = groups[f(id, tied)] || []).push(id));
+        ids.forEach((id) => (groups[f(id)] = groups[f(id)] || []).push(id));
         const keys = Object.keys(groups).sort((x, y) => y - x);
         if (keys.length > 1) return keys.flatMap((k) => breakTie(groups[k]));
       }
-      return ids.slice().sort(byName); // unresolved: organizer decides (coin toss); alphabetical placeholder
+      return ids.slice().sort(byName); // coin toss needed; alphabetical placeholder
     }
     const byWins = {};
     Object.values(t).forEach((r) => (byWins[r.wins] = byWins[r.wins] || []).push(r.id));
-    const order = Object.keys(byWins).sort((x, y) => y - x).flatMap((k) => breakTie(byWins[k]));
-    const rows = order.map((id) => t[id]);
-    return rows;
+    return Object.keys(byWins).sort((x, y) => y - x).flatMap((k) => breakTie(byWins[k])).map((id) => t[id]);
   }
 
   // Resolves seed codes (A1 = 1st in pool A, CX2 = 2nd in championship group X) to team ids.
   // A code resolves only once every match feeding it has been completed.
   function resolveAll(data, results) {
-    const complete = (ms) => ms.length > 0 && ms.every((m) => (matchOutcome(results[m.id]) || {}).final);
+    const complete = (ms) => ms.length > 0 && ms.every((m) => (matchOutcome(results[m.id], m.stage) || {}).final);
     const names = {};
     data.teams.forEach((t) => (names[t.id] = t.name));
     const table = {}, resolved = {}, groupTables = {};
