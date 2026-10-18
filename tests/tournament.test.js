@@ -38,3 +38,13 @@ assert.strictEqual(res.resolved.CX1, undefined, "playoffs unresolved until playe
 assert.deepStrictEqual(T.parseResults("match,s1a,s1b\nA1,25,20,,\n").A1, [[25, 20]]);
 assert.strictEqual(T.matchOutcome([[25, 20]]).final, false);
 console.log("ok");
+
+// Tiebreakers: 3-way tie on wins, resolved by set ratio among tied teams
+const mk = (id, a, b) => ({ id, a, b });
+const ms = [mk("1", "x", "y"), mk("2", "y", "z"), mk("3", "z", "x"), mk("4", "x", "w"), mk("5", "y", "w"), mk("6", "z", "w")];
+const r = T.parseResults(["match,s1a,s1b,s2a,s2b,s3a,s3b",
+  "1,25,20,25,20,,", "2,25,20,25,20,,", "3,25,23,20,25,15,10", // x>y, y>z, z>x (3-1 sets)
+  "4,25,0,25,0,,", "5,25,0,25,0,,", "6,25,0,25,0,,"].join("\n"));
+const st = T.standings(["x", "y", "z", "w"], ms, r);
+assert.deepStrictEqual(st.map((s) => s.id), ["x", "y", "z", "w"]); // sets among tied: x 3-2, y 2-2, z 2-3
+console.log("ok tiebreak");

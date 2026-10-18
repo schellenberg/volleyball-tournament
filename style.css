@@ -29,3 +29,5 @@ tr.adv td{background:#eaf7ee}
 .photo{position:relative;aspect-ratio:4/3;background:#12305c;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:700}
 .photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .grid.teams{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.rules{background:#fff;border-radius:8px;padding:.6rem .9rem;margin-bottom:.8rem;box-shadow:0 1px 3px #0002;font-size:.9rem}
+.rules summary{font-weight:600;cursor:pointer}

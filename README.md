@@ -8,6 +8,8 @@ Mobile-friendly static site (host on GitHub Pages or open via any static server,
 - Schedule: pool play 8:30–12:00, lunch, playoff round robins 12:30–2:50, placement matches 2:50–4:00 (35-minute slots; edit `data/tournament.json` to change).
 
 ## Entering results
+Tie-breaking (shown on the Pools tab) is documented in `app.js` (`TIEBREAK`) and implemented in `tournament.js`.
+
 Results are a CSV with columns `match,s1a,s1b,s2a,s2b,s3a,s3b` (match ids like `A1`, `CX2`, `FC1` are in `data/tournament.json`; scores are for the first-listed / second-listed team).
 - Simple: edit `data/results.csv`.
 - Google Sheet: create a sheet with those columns, *File → Share → Publish to web → CSV*, and paste the URL into `RESULTS_CSV_URL` in `config.js`. The page refreshes every 60 seconds; standings and playoff matchups fill in automatically.

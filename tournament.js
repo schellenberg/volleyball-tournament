@@ -66,21 +66,46 @@
       B.pointsFor += o.pointsB; B.pointsAgainst += o.pointsA;
       if (o.setsA > o.setsB) { A.wins++; B.losses++; } else { B.wins++; A.losses++; }
     });
-    const rows = Object.values(t);
-    const h2h = (x, y) => {
-      const m = matches.find((q) => (q.a === x.id && q.b === y.id) || (q.a === y.id && q.b === x.id));
-      const o = m && matchOutcome(results[m.id]);
-      if (!o || !o.final) return 0;
-      const xWon = (m.a === x.id) === (o.setsA > o.setsB);
-      return xWon ? -1 : 1;
+    const ratio = (n, d) => (d === 0 ? (n === 0 ? 0 : Infinity) : n / d);
+    const final = matches.filter((m) => t[m.a] && t[m.b] && (matchOutcome(results[m.id]) || {}).final);
+    // Wins / set and point totals counting only the given team ids' matches against each other
+    const within = (ids) => {
+      const s = {};
+      ids.forEach((id) => (s[id] = { w: 0, sw: 0, sl: 0, pf: 0, pa: 0 }));
+      final.forEach((m) => {
+        if (!s[m.a] || !s[m.b]) return;
+        const o = matchOutcome(results[m.id]);
+        s[m.a].sw += o.setsA; s[m.a].sl += o.setsB; s[m.a].pf += o.pointsA; s[m.a].pa += o.pointsB;
+        s[m.b].sw += o.setsB; s[m.b].sl += o.setsA; s[m.b].pf += o.pointsB; s[m.b].pa += o.pointsA;
+        s[o.setsA > o.setsB ? m.a : m.b].w++;
+      });
+      return s;
     };
-    // Tiebreakers: wins, set differential, point differential, head-to-head, name
-    rows.sort((x, y) =>
-      y.wins - x.wins ||
-      (y.setsWon - y.setsLost) - (x.setsWon - x.setsLost) ||
-      (y.pointsFor - y.pointsAgainst) - (x.pointsFor - x.pointsAgainst) ||
-      h2h(x, y) ||
-      ((names && names[x.id]) || x.id).localeCompare((names && names[y.id]) || y.id));
+    const all = within(teamIds);
+    const criteria = [
+      (id, tied) => tied[id].w,
+      (id, tied) => ratio(tied[id].sw, tied[id].sl),
+      (id) => ratio(all[id].sw, all[id].sl),
+      (id, tied) => ratio(tied[id].pf, tied[id].pa),
+      (id) => ratio(all[id].pf, all[id].pa)
+    ];
+    const byName = (x, y) => ((names && names[x]) || x).localeCompare((names && names[y]) || y);
+    // Splits a tied group using each criterion in order; any still-tied subgroup restarts at criterion 1
+    function breakTie(ids) {
+      if (ids.length < 2) return ids;
+      const tied = within(ids);
+      for (const f of criteria) {
+        const groups = {};
+        ids.forEach((id) => (groups[f(id, tied)] = groups[f(id, tied)] || []).push(id));
+        const keys = Object.keys(groups).sort((x, y) => y - x);
+        if (keys.length > 1) return keys.flatMap((k) => breakTie(groups[k]));
+      }
+      return ids.slice().sort(byName); // unresolved: organizer decides (coin toss); alphabetical placeholder
+    }
+    const byWins = {};
+    Object.values(t).forEach((r) => (byWins[r.wins] = byWins[r.wins] || []).push(r.id));
+    const order = Object.keys(byWins).sort((x, y) => y - x).flatMap((k) => breakTie(byWins[k]));
+    const rows = order.map((id) => t[id]);
     return rows;
   }
 
